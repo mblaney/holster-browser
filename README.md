@@ -23,6 +23,7 @@ import {
   EditCache,
   SearchAppBar,
   registerServiceWorker,
+  useAccountSync,
 } from "@mblaney/holster-browser"
 ```
 
@@ -77,3 +78,13 @@ Displays available login codes for sharing with new users. Returns null when no 
 #### EditCache
 
 Displays audio and video cache contents with options to remove individual items or clear a cache entirely.
+
+#### useAccountSync
+
+A hook that listens to the host accounts list and keeps the user's contacts in sync. When a contact's public key changes it re-shares any encrypted data under the new key, and adds new contacts automatically when they were referred by the current user.
+
+```jsx
+const accountsReady = useAccountSync(holster, user, host, code)
+```
+
+Returns a boolean that becomes `true` once the accounts list has been received for the first time.
