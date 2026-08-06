@@ -10,39 +10,33 @@ import Typography from "@mui/material/Typography"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
-const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
-  const [name, setName] = useState(current ?? "")
+const Signup = ({user}) => {
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [message, setMessage] = useState(loggedIn ? "Already logged in" : "")
-  const [disabledButton, setDisabledButton] = useState(loggedIn)
+  const [email, setEmail] = useState("")
+  const [message, setMessage] = useState(user.is ? "Already logged in" : "")
+  const [disabledButton, setDisabledButton] = useState(!!user.is)
 
-  const update = username => {
+  const signup = () => {
     if (!username) {
       setMessage("Please choose a username")
       return
     }
+    if (!/^\w+$/.test(username)) {
+      setMessage("Username must contain only numbers, letters and underscore")
+      return
+    }
+    if (!email) {
+      setMessage("Please provide your email")
+      return
+    }
 
     setDisabledButton(true)
-    setMessage("Updating password...")
+    setMessage("Creating account...")
 
     user.create(username, password, err => {
       if (err) {
-        if (err === "Username already exists") {
-          let match = username.match(/^(\w+)\.(\d)$/)
-          if (match) {
-            let increment = Number(match[2]) + 1
-            if (increment === 10) {
-              setDisabledButton(false)
-              setMessage("Too many password resets")
-              return
-            }
-            update(`${match[1]}.${increment}`)
-            return
-          }
-          update(`${username}.1`)
-          return
-        }
         setDisabledButton(false)
         setMessage(err)
         return
@@ -55,39 +49,27 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
           return
         }
 
-        fetch(`${window.location.origin}/update-password`, {
+        fetch(`${window.location.origin}/signup`, {
           method: "POST",
           headers: {"Content-Type": "application/json;charset=utf-8"},
           body: JSON.stringify({
-            code: code ?? null,
-            reset: reset ?? null,
             pub: user.is.pub,
             epub: user.is.epub,
             username: username,
-            name: name,
+            email: email,
           }),
         })
           .then(res => res.text().then(text => ({ok: res.ok, text: text})))
           .then(res => {
+            setDisabledButton(false)
             if (!res.ok) {
-              setDisabledButton(false)
-              user.delete(username, password)
+              user.delete(username, password, console.log)
               setMessage(res.text)
               return
             }
 
-            // The previous public key is returned to copy public user data.
-            user.get([res.text, "public"], data => {
-              user.get("public").put(data, err => {
-                if (err) console.error(err)
-              })
-            })
-
-            setMessage("Password updated")
-            setTimeout(() => {
-              setDisabledButton(false)
-              window.location = "/login"
-            }, 2000)
+            setMessage("Account created")
+            window.location = "/login"
           })
       })
     })
@@ -95,20 +77,21 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
 
   return (
     <>
-      <Typography variant="h5">Update Password</Typography>
+      <Typography variant="h5">Sign up</Typography>
       <TextField
-        id="update-username"
+        id="signup-username"
         label="Username"
         variant="outlined"
         fullWidth={true}
         margin="normal"
-        value={name}
-        onChange={event => setName(event.target.value)}
+        value={username}
+        onChange={event => setUsername(event.target.value)}
+        slotProps={{inputLabel: {shrink: true}}}
       />
       <FormControl variant="outlined" fullWidth={true} margin="normal">
-        <InputLabel htmlFor="update-password">Password</InputLabel>
+        <InputLabel htmlFor="signup-password">Password</InputLabel>
         <OutlinedInput
-          id="update-password"
+          id="signup-password"
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={event => setPassword(event.target.value)}
@@ -126,11 +109,20 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
           label="Password"
         />
       </FormControl>
+      <TextField
+        id="signup-email"
+        label="Email"
+        variant="outlined"
+        fullWidth={true}
+        margin="normal"
+        value={email}
+        onChange={event => setEmail(event.target.value)}
+      />
       <Button
         sx={{mt: 1}}
         variant="contained"
         disabled={disabledButton}
-        onClick={() => update(name)}
+        onClick={signup}
       >
         Submit
       </Button>
@@ -143,4 +135,4 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
   )
 }
 
-export default UpdatePassword
+export default Signup

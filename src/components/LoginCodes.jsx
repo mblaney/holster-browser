@@ -43,11 +43,7 @@ const LoginCodes = ({user, host, code}) => {
       }
 
       secret = await user.SEA.secret({epub: epub}, user.is)
-      user
-        .get([host, "shared"])
-        .next("login_codes")
-        .next(code)
-        .on(update, true)
+      user.get([host, "shared"]).next("login_codes").next(code).on(update, true)
     })
 
     return () => {

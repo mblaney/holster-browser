@@ -14,6 +14,7 @@ Peer dependencies: `@mblaney/holster`, `@mui/material`, `@mui/icons-material`, `
 import {
   Login,
   Register,
+  Signup,
   RequestCode,
   ValidateEmail,
   ResetPassword,
@@ -22,7 +23,6 @@ import {
   LoginCodes,
   EditCache,
   SearchAppBar,
-  registerServiceWorker,
   useAccountSync,
 } from "@mblaney/holster-browser"
 ```
@@ -58,14 +58,59 @@ const appBar = {
 
 #### Auth components
 
-`Login`, `Register`, `RequestCode`, `ValidateEmail`, `ResetPassword`, and `UpdatePassword` all accept `user`, `mode`, `setMode`, and `appBar` props. They render a `SearchAppBar` only when the user is already logged in.
+`Login`, `Register`, `Signup`, `RequestCode`, `ValidateEmail`, `ResetPassword`, and `UpdatePassword` render only their own form content (fields, submit button, status message) — no page container, card, or app bar. This keeps holster-browser out of the business of page layout, so each app is free to wrap them however it likes, including its own home nav or logo.
+
+`Register` needs the login code supplied up front (obtained via the waitlist flow or shared directly). `Signup` instead has the server assign a login code automatically from a pool (see the `signup` option in [holster-router](https://github.com/mblaney/holster-router)); the code isn't provided by the client, it's sent back in the sign up email that also asks the user to validate their address.
+
+Each component's props:
+
+| Component | Props |
+| --- | --- |
+| `Login` | `user`, `host` |
+| `Register` | `user` |
+| `Signup` | `user` |
+| `RequestCode` | *(none)* |
+| `ValidateEmail` | `code`, `validate` |
+| `ResetPassword` | `loggedIn` |
+| `UpdatePassword` | `user`, `loggedIn`, `current`, `code`, `reset` |
+
+`ValidateEmail`'s `code`/`validate` and `UpdatePassword`'s `current`/`code`/`reset` come from the query params on the links in the sign up and reset-password emails respectively.
+
+Wrap them in your own layout, e.g.:
+
+```jsx
+const FormLayout = ({loggedIn, mode, setMode, appBar, children}) => (
+  <>
+    {loggedIn && <SearchAppBar mode={mode} setMode={setMode} {...appBar} />}
+    <Container maxWidth="sm">
+      <Grid container>
+        <Grid item xs={12}>
+          <Card sx={{mt: 2}}>
+            <CardContent>{children}</CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Container>
+  </>
+)
+
+<FormLayout loggedIn={!!user.is} mode={mode} setMode={setMode} appBar={appBar}>
+  <Login user={user} host={host} />
+</FormLayout>
+```
 
 #### Settings
 
 A base settings page with name greeting, password change, and logout. Pass app-specific content as `children`, which renders between the greeting and password cards.
 
 ```jsx
-<Settings user={user} mode={mode} setMode={setMode} appBar={appBar} buildDate={buildDate}>
+<Settings
+  user={user}
+  mode={mode}
+  setMode={setMode}
+  appBar={appBar}
+  buildDate={buildDate}
+>
   <LoginCodes user={user} host={host} code={code} />
   {/* other app-specific settings */}
 </Settings>

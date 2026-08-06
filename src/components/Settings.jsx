@@ -51,9 +51,7 @@ const Settings = ({user, mode, setMode, appBar, buildDate, children}) => {
 
   return (
     <>
-      {user.is && (
-        <SearchAppBar mode={mode} setMode={setMode} {...appBar} />
-      )}
+      {user.is && <SearchAppBar mode={mode} setMode={setMode} {...appBar} />}
       <Container maxWidth="sm">
         <Grid container>
           <Grid item xs={12}>
@@ -76,8 +74,6 @@ const Settings = ({user, mode, setMode, appBar, buildDate, children}) => {
                   variant="outlined"
                   fullWidth={true}
                   margin="normal"
-                  value={password}
-                  onChange={event => setPassword(event.target.value)}
                 >
                   <InputLabel htmlFor="settings-password">
                     Current Password
@@ -86,6 +82,8 @@ const Settings = ({user, mode, setMode, appBar, buildDate, children}) => {
                     id="settings-password"
                     autoComplete="password"
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={event => setPassword(event.target.value)}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -104,8 +102,6 @@ const Settings = ({user, mode, setMode, appBar, buildDate, children}) => {
                   variant="outlined"
                   fullWidth={true}
                   margin="normal"
-                  value={newPassword}
-                  onChange={event => setNewPassword(event.target.value)}
                 >
                   <InputLabel htmlFor="settings-new-password">
                     New Password
@@ -114,6 +110,8 @@ const Settings = ({user, mode, setMode, appBar, buildDate, children}) => {
                     id="settings-new-password"
                     autoComplete="new-password"
                     type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={event => setNewPassword(event.target.value)}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton

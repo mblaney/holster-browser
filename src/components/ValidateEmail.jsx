@@ -1,11 +1,8 @@
 import {useState} from "react"
 import Button from "@mui/material/Button"
-import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
-import SearchAppBar from "./SearchAppBar.jsx"
 
-const ValidateEmail = ({loggedIn, mode, setMode, appBar, code, validate}) => {
+const ValidateEmail = ({code, validate}) => {
   const [message, setMessage] = useState("Validate your email address:")
   const [disabledButton, setDisabledButton] = useState(false)
 
@@ -35,24 +32,15 @@ const ValidateEmail = ({loggedIn, mode, setMode, appBar, code, validate}) => {
 
   return (
     <>
-      {loggedIn && (
-        <SearchAppBar mode={mode} setMode={setMode} {...appBar} />
-      )}
-      <Container maxWidth="sm">
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography sx={{m: 1}}>{message}</Typography>
-            <Button
-              sx={{mt: 1}}
-              variant="contained"
-              disabled={disabledButton}
-              onClick={validateEmail}
-            >
-              Validate
-            </Button>
-          </Grid>
-        </Grid>
-      </Container>
+      <Typography sx={{m: 1}}>{message}</Typography>
+      <Button
+        sx={{mt: 1}}
+        variant="contained"
+        disabled={disabledButton}
+        onClick={validateEmail}
+      >
+        Validate
+      </Button>
     </>
   )
 }

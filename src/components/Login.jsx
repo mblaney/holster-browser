@@ -1,13 +1,9 @@
 import {useRef, useState} from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
 import Checkbox from "@mui/material/Checkbox"
-import Container from "@mui/material/Container"
 import FormControl from "@mui/material/FormControl"
 import FormControlLabel from "@mui/material/FormControlLabel"
-import Grid from "@mui/material/Grid"
 import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import InputLabel from "@mui/material/InputLabel"
@@ -16,15 +12,14 @@ import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
-import SearchAppBar from "./SearchAppBar.jsx"
 
-const Login = ({user, host, mode, setMode, appBar}) => {
+const Login = ({user, host}) => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [stayLoggedIn, setStayLoggedIn] = useState(false)
   const [message, setMessage] = useState(user.is ? "Already logged in" : "")
-  const [disabledButton, setDisabledButton] = useState(user.is)
+  const [disabledButton, setDisabledButton] = useState(!!user.is)
   const found = useRef(false)
 
   const checkAccount = async () => {
@@ -111,79 +106,60 @@ const Login = ({user, host, mode, setMode, appBar}) => {
 
   return (
     <>
-      {user.is && (
-        <SearchAppBar mode={mode} setMode={setMode} {...appBar} />
-      )}
-      <Container maxWidth="sm">
-        <Grid container>
-          <Grid item xs={12}>
-            <Card sx={{mt: 2}}>
-              <CardContent>
-                <Typography variant="h5">Login</Typography>
-                <TextField
-                  id="login-username"
-                  label="Username"
-                  variant="outlined"
-                  fullWidth={true}
-                  margin="normal"
-                  value={username}
-                  onChange={event => setUsername(event.target.value)}
-                  InputLabelProps={{shrink: true}}
-                />
-                <FormControl
-                  variant="outlined"
-                  fullWidth={true}
-                  margin="normal"
-                  value={password}
-                  onChange={event => setPassword(event.target.value)}
-                >
-                  <InputLabel htmlFor="login-password">Password</InputLabel>
-                  <OutlinedInput
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={() => setShowPassword(show => !show)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
-                  />
-                </FormControl>
-                <Box sx={{display: "flex", alignItems: "center", mt: 1}}>
-                  {!user.is && !message && (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={stayLoggedIn}
-                          onChange={e => setStayLoggedIn(e.target.checked)}
-                        />
-                      }
-                      label="Stay logged in"
-                    />
-                  )}
-                  {message && (
-                    <Typography variant="body2">{message}</Typography>
-                  )}
-                  <Button
-                    sx={{ml: "auto"}}
-                    variant="contained"
-                    disabled={disabledButton}
-                    onClick={() => login(username)}
-                  >
-                    Submit
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
+      <Typography variant="h5">Login</Typography>
+      <TextField
+        id="login-username"
+        label="Username"
+        variant="outlined"
+        fullWidth={true}
+        margin="normal"
+        value={username}
+        onChange={event => setUsername(event.target.value)}
+        slotProps={{inputLabel: {shrink: true}}}
+      />
+      <FormControl variant="outlined" fullWidth={true} margin="normal">
+        <InputLabel htmlFor="login-password">Password</InputLabel>
+        <OutlinedInput
+          id="login-password"
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={event => setPassword(event.target.value)}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPassword(show => !show)}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
+          label="Password"
+        />
+      </FormControl>
+      <Box sx={{display: "flex", alignItems: "center", mt: 1}}>
+        {!user.is && !message && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={stayLoggedIn}
+                onChange={e => setStayLoggedIn(e.target.checked)}
+              />
+            }
+            label="Stay logged in"
+          />
+        )}
+        {message && <Typography variant="body2">{message}</Typography>}
+        <Button
+          sx={{ml: "auto"}}
+          variant="contained"
+          disabled={disabledButton}
+          onClick={() => login(username)}
+        >
+          Submit
+        </Button>
+      </Box>
     </>
   )
 }
