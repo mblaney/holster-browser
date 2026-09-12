@@ -12,6 +12,7 @@ import Switch from "@mui/material/Switch"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
+import ClearIcon from "@mui/icons-material/Clear"
 import DarkModeIcon from "@mui/icons-material/DarkMode"
 import LightModeIcon from "@mui/icons-material/LightMode"
 import MoreIcon from "@mui/icons-material/MoreVert"
@@ -56,7 +57,7 @@ const StyledInputBase = styled(InputBase, {
 })(({theme, collapsed}) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
+    padding: theme.spacing(1, 4, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: collapsed ? 0 : "100%",
@@ -92,6 +93,12 @@ const SearchAppBar = ({
   const [searchValue, setSearchValue] = useState(searchQuery || "")
   const [anchorEl, setAnchorEl] = useState(null)
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null)
+
+  const handleClear = () => {
+    setSearchValue("")
+    onSearch?.("")
+    searchInputRef.current?.focus()
+  }
 
   const isMenuOpen = Boolean(anchorEl)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
@@ -233,6 +240,10 @@ const SearchAppBar = ({
               onKeyDown={e => {
                 if (e.key === "Enter") {
                   const trimmed = searchValue.trim()
+                  if (trimmed === "") {
+                    if (onSearch) onSearch("")
+                    return
+                  }
                   if (trimmed.length >= 3) {
                     setSearchValue(trimmed)
                     if (onSearch) {
@@ -240,7 +251,6 @@ const SearchAppBar = ({
                     } else {
                       window.location = `/?search=${encodeURIComponent(trimmed)}`
                     }
-                    searchInputRef.current?.blur()
                   }
                 } else if (e.key === "Escape") {
                   setSearchValue("")
@@ -249,6 +259,24 @@ const SearchAppBar = ({
                 }
               }}
             />
+            {searchValue && (
+              <IconButton
+                size="small"
+                aria-label="clear search"
+                onClick={event => {
+                  event.stopPropagation()
+                  handleClear()
+                }}
+                sx={{
+                  position: "absolute",
+                  right: 4,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            )}
           </Search>
           <Box sx={{display: {xs: "none", md: "flex"}}}>
             <Switch checked={mode === "dark"} onChange={changeMode} />

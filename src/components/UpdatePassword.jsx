@@ -12,8 +12,10 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
 const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
   const [name, setName] = useState(current ?? "")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const [newPassword, setNewPassword] = useState("")
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [repeatPassword, setRepeatPassword] = useState("")
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false)
   const [message, setMessage] = useState(loggedIn ? "Already logged in" : "")
   const [disabledButton, setDisabledButton] = useState(loggedIn)
 
@@ -26,7 +28,7 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
     setDisabledButton(true)
     setMessage("Updating password...")
 
-    user.create(username, password, err => {
+    user.create(username, newPassword, err => {
       if (err) {
         if (err === "Username already exists") {
           let match = username.match(/^(\w+)\.(\d)$/)
@@ -48,9 +50,10 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
         return
       }
 
-      user.auth(username, password, err => {
+      user.auth(username, newPassword, err => {
         if (err) {
           setDisabledButton(false)
+          user.delete(username, newPassword)
           setMessage(err)
           return
         }
@@ -71,7 +74,7 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
           .then(res => {
             if (!res.ok) {
               setDisabledButton(false)
-              user.delete(username, password)
+              user.delete(username, newPassword)
               setMessage(res.text)
               return
             }
@@ -93,6 +96,14 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
     })
   }
 
+  const submit = () => {
+    if (newPassword !== repeatPassword) {
+      setMessage("Passwords do not match")
+      return
+    }
+    update(name)
+  }
+
   return (
     <>
       <Typography variant="h5">Update Password</Typography>
@@ -106,31 +117,54 @@ const UpdatePassword = ({user, loggedIn, current, code, reset}) => {
         onChange={event => setName(event.target.value)}
       />
       <FormControl variant="outlined" fullWidth={true} margin="normal">
-        <InputLabel htmlFor="update-password">Password</InputLabel>
+        <InputLabel htmlFor="update-new-password">New Password</InputLabel>
         <OutlinedInput
-          id="update-password"
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={event => setPassword(event.target.value)}
+          id="update-new-password"
+          type={showNewPassword ? "text" : "password"}
+          value={newPassword}
+          onChange={event => setNewPassword(event.target.value)}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
-                aria-label="toggle password visibility"
-                onClick={() => setShowPassword(show => !show)}
+                aria-label="toggle new password visibility"
+                onClick={() => setShowNewPassword(show => !show)}
                 edge="end"
               >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           }
-          label="Password"
+          label="New Password"
+        />
+      </FormControl>
+      <FormControl variant="outlined" fullWidth={true} margin="normal">
+        <InputLabel htmlFor="update-repeat-password">
+          Repeat Password
+        </InputLabel>
+        <OutlinedInput
+          id="update-repeat-password"
+          type={showRepeatPassword ? "text" : "password"}
+          value={repeatPassword}
+          onChange={event => setRepeatPassword(event.target.value)}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle repeat password visibility"
+                onClick={() => setShowRepeatPassword(show => !show)}
+                edge="end"
+              >
+                {showRepeatPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
+          label="Repeat Password"
         />
       </FormControl>
       <Button
         sx={{mt: 1}}
         variant="contained"
         disabled={disabledButton}
-        onClick={() => update(name)}
+        onClick={submit}
       >
         Submit
       </Button>

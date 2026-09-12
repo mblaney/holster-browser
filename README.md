@@ -64,14 +64,14 @@ const appBar = {
 
 Each component's props:
 
-| Component | Props |
-| --- | --- |
-| `Login` | `user`, `host` |
-| `Register` | `user` |
-| `Signup` | `user` |
-| `RequestCode` | *(none)* |
-| `ValidateEmail` | `code`, `validate` |
-| `ResetPassword` | `loggedIn` |
+| Component        | Props                                          |
+| ---------------- | ---------------------------------------------- |
+| `Login`          | `user`, `host`                                 |
+| `Register`       | `user`                                         |
+| `Signup`         | `user`                                         |
+| `RequestCode`    | _(none)_                                       |
+| `ValidateEmail`  | `code`, `validate`                             |
+| `ResetPassword`  | `loggedIn`                                     |
 | `UpdatePassword` | `user`, `loggedIn`, `current`, `code`, `reset` |
 
 `ValidateEmail`'s `code`/`validate` and `UpdatePassword`'s `current`/`code`/`reset` come from the query params on the links in the sign up and reset-password emails respectively.

@@ -42,21 +42,24 @@ const Signup = ({user}) => {
         return
       }
 
-      user.auth(username, password, err => {
+      user.auth(username, password, async err => {
         if (err) {
           setDisabledButton(false)
           setMessage(err)
           return
         }
 
+        const signed = await user.SEA.sign(
+          {username, email, timestamp: Date.now()},
+          user.is,
+        )
         fetch(`${window.location.origin}/signup`, {
           method: "POST",
           headers: {"Content-Type": "application/json;charset=utf-8"},
           body: JSON.stringify({
             pub: user.is.pub,
             epub: user.is.epub,
-            username: username,
-            email: email,
+            signed,
           }),
         })
           .then(res => res.text().then(text => ({ok: res.ok, text: text})))

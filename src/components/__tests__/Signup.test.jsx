@@ -6,6 +6,7 @@ import Signup from "../Signup.jsx"
 function createMockUser({createErr = null, authErr = null, is = null} = {}) {
   const user = {
     is,
+    SEA: {sign: vi.fn(() => Promise.resolve("mock-signed"))},
     create: vi.fn((username, password, cb) => cb(createErr)),
     auth: vi.fn((username, password, cb) => {
       if (!authErr) user.is = {pub: "mock-pub", epub: "mock-epub"}
@@ -117,6 +118,14 @@ describe("Signup Component", () => {
 
     expect(user.create).toHaveBeenCalledWith("alice", "", expect.any(Function))
     expect(user.auth).toHaveBeenCalledWith("alice", "", expect.any(Function))
+    expect(user.SEA.sign).toHaveBeenCalledWith(
+      {
+        username: "alice",
+        email: "alice@test.com",
+        timestamp: expect.any(Number),
+      },
+      {pub: "mock-pub", epub: "mock-epub"},
+    )
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining("/signup"),
       expect.objectContaining({
@@ -124,8 +133,7 @@ describe("Signup Component", () => {
         body: JSON.stringify({
           pub: "mock-pub",
           epub: "mock-epub",
-          username: "alice",
-          email: "alice@test.com",
+          signed: "mock-signed",
         }),
       }),
     )
